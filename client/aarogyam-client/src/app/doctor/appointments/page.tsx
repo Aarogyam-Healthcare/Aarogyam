@@ -2,9 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Calendar, Clock, User, Inbox, FileText, Save, X } from "lucide-react";
+import { Calendar, Clock, FileText, Inbox, Save, User, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
@@ -349,7 +349,9 @@ export default function AppointmentsPage() {
   return (
     <div className="relative flex h-screen">
       <div
-        className={`flex-1 transition-all duration-300 ${isRequestedVisible ? "md:w-2/3" : "w-full"}`}
+        className={`flex-1 transition-all duration-300 ${
+          isRequestedVisible ? "md:w-2/3" : "w-full"
+        }`}
       >
         <h2 className="text-2xl font-bold mb-4">Your upcoming Appointments</h2>
         {confirmedAppointments.map((appointment) => {

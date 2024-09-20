@@ -27,7 +27,7 @@ router.post(
 );
 
 router.delete(
-  "",
+  "/:id",
   verifyRole([Role.DOCTOR]),
   appointmentSlotController.deleteAppointmentSlot
 );

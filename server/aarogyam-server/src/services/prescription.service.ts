@@ -32,7 +32,7 @@ export const create = async (
       med.frequency
     );
     for (const time of med.timesToTake) {
-      await medicationTimeDao.create(medication.id, String(time));
+      await medicationTimeDao.create(medication.id, time.time);
     }
   }
 
@@ -43,7 +43,23 @@ export const deletePrescription = async (
   prescriptionId: number
 ): Promise<any> => {
   if (!prescriptionId) {
-    throw new Error(`Prescription with id ${prescriptionId} not found`);
+    return Format.badRequest(
+      `Prescription with id ${prescriptionId} not found`
+    );
+  }
+
+  const medications = await prescriptionDao.findByPrescription(prescriptionId);
+
+  if (medications.length === 0) {
+    return Format.notFound(
+      `No medications found for prescription ID ${prescriptionId}`
+    );
+  }
+
+  // Loop through each medication and delete the associated medication times first
+  for (const medication of medications) {
+    await prescriptionDao.deleteMedicationTimeByMedication(medication.id);
+    await prescriptionDao.deleteMedications(medication.id);
   }
 
   await prescriptionDao.deletePrescription(prescriptionId);
@@ -55,7 +71,7 @@ export const updatePrescription = async (
   prescriptionId: number,
   userId: number,
   prescriptionData: PrescriptionUpdateDTO
-): Promise<{ code: number; data: any; message: string }> => {
+): Promise<any> => {
   if (!prescriptionId) {
     return Format.badRequest("Prescription Id is required");
   }

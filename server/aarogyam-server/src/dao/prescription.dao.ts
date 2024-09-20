@@ -1,4 +1,4 @@
-import { Prescription, PrismaClient } from "@prisma/client";
+import { Medication, Prescription, PrismaClient } from "@prisma/client";
 import {
   PrescriptionDTO,
   PrescriptionUpdateDTO,
@@ -105,14 +105,15 @@ export const updatePrescription = async (
   doctorId: number,
   prescriptionData: PrescriptionUpdateDTO
 ): Promise<any> => {
+  // Upsert the prescription
   return prescriptionClient.upsert({
     where: { id: prescriptionId },
     create: {
       patient: {
-        connect: { id: prescriptionData.patientId }, // Relating patient with connect
+        connect: { id: prescriptionData.patientId },
       },
       doctor: {
-        connect: { id: doctorId }, // Relating doctor with connect
+        connect: { id: doctorId },
       },
       notes: prescriptionData.notes,
       medicines: {
@@ -122,37 +123,39 @@ export const updatePrescription = async (
           frequency: medication.frequency,
           timesToTake: {
             create: medication.timesToTake.map((time) => ({
-              time: time.time, // No medicationId, Prisma will link it automatically
+              time: time.time,
             })),
           },
           source: medication.source,
           patient: {
-            connect: { id: prescriptionData.patientId }, // Connecting the patient to the medicine
+            connect: { id: prescriptionData.patientId },
           },
         })),
       },
     },
     update: {
       patient: {
-        connect: { id: prescriptionData.patientId }, // Relating patient with connect
+        connect: { id: prescriptionData.patientId },
       },
       notes: prescriptionData.notes,
       medicines: {
+        // First, delete old medicines linked to the prescription
         deleteMany: {
-          prescriptionId, // Delete all old medicines related to this prescription
+          prescriptionId, // Make sure this matches the FK correctly
         },
+        // Then, create new medicines
         create: prescriptionData.medicines.map((medication) => ({
           name: medication.name,
           dosage: medication.dosage,
           frequency: medication.frequency,
           timesToTake: {
             create: medication.timesToTake.map((time) => ({
-              time: time.time, // No medicationId needed here either
+              time: time.time,
             })),
           },
           source: medication.source,
           patient: {
-            connect: { id: prescriptionData.patientId }, // Connecting the patient to the medicine
+            connect: { id: prescriptionData.patientId },
           },
         })),
       },
@@ -160,7 +163,7 @@ export const updatePrescription = async (
     include: {
       medicines: {
         include: {
-          timesToTake: true, // Including timesToTake in the response
+          timesToTake: true,
         },
       },
     },
@@ -200,6 +203,34 @@ export const getByPatientId = async (
   return prescriptionClient.findMany({
     where: {
       patientId,
+    },
+  });
+};
+
+export const findByPrescription = async (
+  prescriptionId: number
+): Promise<Medication[]> => {
+  return medicationClient.findMany({
+    where: {
+      prescriptionId,
+    },
+  });
+};
+
+export const deleteMedicationTimeByMedication = async (
+  medicationId: number
+): Promise<any> => {
+  return medicationTimeClient.deleteMany({
+    where: {
+      medicationId,
+    },
+  });
+};
+
+export const deleteMedications = async (medicationId: number): Promise<any> => {
+  return medicationClient.delete({
+    where: {
+      id: medicationId,
     },
   });
 };

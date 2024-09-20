@@ -2,7 +2,7 @@
 import { useParams } from "next/navigation";
 import React, { useState } from "react";
 import { z } from "zod";
-import { useForm, FormProvider } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Card,
@@ -35,9 +35,9 @@ import {
 } from "@/components/ui/popover";
 import {
   Calendar as CalendarIcon,
+  Edit,
   MoreVertical,
   Stethoscope,
-  Edit,
   Trash2,
   User2,
 } from "lucide-react";

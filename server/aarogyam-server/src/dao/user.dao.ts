@@ -99,10 +99,10 @@ export async function getUserWithRole(id: number, role: Role) {
               },
             }
           : false,
-      password: false,
-      isVerified: false,
-      createdAt: false,
-      updatedAt: false,
+      // password: false,
+      // isVerified: false,
+      // createdAt: false,
+      // updatedAt: false,
     },
   });
 }

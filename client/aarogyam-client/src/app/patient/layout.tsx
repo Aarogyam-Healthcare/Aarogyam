@@ -4,7 +4,6 @@ import {
   Apple,
   BellDot,
   CalendarDays,
-  House,
   MessagesSquare,
   PillBottle,
   SquareLibrary,
@@ -27,7 +26,7 @@ export default function PatientLayout({ children }: { children: ReactNode }) {
 
   // Define the sidebar items with text, icon, and route
   const sidebarItems = [
-    { text: "Dashboard", icon: <House size={24} />, href: "/patient" },
+    // { text: "Dashboard", icon: <House size={24} />, href: "/patient" },
     {
       text: "Medical Records",
       icon: <SquareLibrary size={24} />,

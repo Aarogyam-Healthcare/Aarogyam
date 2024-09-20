@@ -1,6 +1,6 @@
 import * as medicationDao from "../dao/medication.dao";
 import Format from "../utils/format";
-import { MedicationDTO } from "../types/medication.dto";
+import { MedicationDTO, MedicationUpdateDTO } from "../types/medication.dto";
 import * as userDao from "../dao/user.dao";
 import { Patient, Role, User } from "@prisma/client";
 import * as medicationTimeDao from "../dao/medicationTime.dao";
@@ -23,9 +23,7 @@ export const createMedication = async (
     medicationData
   );
 
-  const newTimes = new Set(
-    medicationData.timesToTake.map((time) => String(time))
-  );
+  const newTimes = new Set(medicationData.timesToTake.map((time) => time.time));
 
   for (const time of newTimes) {
     await medicationTimeDao.create(createdMedication.id, time);
@@ -76,6 +74,7 @@ export const getAllMedication = async (userId: number): Promise<any> => {
   const medications = await medicationDao.getAllMedicationsByPatientId(
     userPatient.patient.id
   );
+  console.log(medications);
 
   if (!medications) {
     return Format.notFound("No medications found for this patient");
@@ -85,7 +84,7 @@ export const getAllMedication = async (userId: number): Promise<any> => {
 
 export const updateForMedication = async (
   userId: number,
-  medicationData: MedicationDTO
+  medicationData: MedicationUpdateDTO
 ): Promise<any> => {
   const userPatient = (await userDao.getUserWithRole(
     userId,

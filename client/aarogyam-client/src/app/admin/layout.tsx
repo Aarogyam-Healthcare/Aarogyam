@@ -1,6 +1,6 @@
 "use client";
 import Sidebar from "@/components/Sidebar";
-import { BellDot, House, Hospital, User } from "lucide-react";
+import { BellDot, Hospital, House, User } from "lucide-react";
 import { SidebarItem } from "@/components/SidebarItem";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

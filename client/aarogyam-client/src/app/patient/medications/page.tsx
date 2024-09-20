@@ -1,18 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Trash2, Edit2, X } from "lucide-react"; // Import Trash, Edit, and X icons from Lucide
+import { Edit2, Trash2, X } from "lucide-react"; // Import Trash, Edit, and X icons from Lucide
+import api from "@/lib/api";
 
 interface Medicine {
   name: string;
-  times: string[]; // stores times in 'HH:mm' format
-  dose: string;
-  frequency: number; // frequency is equal to the length of times array
-  source: "Doctor Prescribed" | "Your added"; // Two possible values
+  timesToTake: Time[]; // stores timesToTake in 'HH:mm' format
+  dosage: string;
+  frequency: string; // frequency is equal to the length of timesToTake array
+  source: "DOCTOR" | "PATIENT"; // Two possible values
 }
+
+type Time = {
+  time: string;
+};
+
 interface Prescription {
   id: string; // Unique identifier for the prescription
   patientName: string; // Name of the patient
@@ -23,78 +29,63 @@ interface Prescription {
 }
 
 export default function Medications() {
-  const [medicines, setMedicines] = useState<Medicine[]>([
-    {
-      name: "Aspirin",
-      times: ["08:00", "20:00"],
-      dose: "2 tablets",
-      frequency: 2,
-      source: "Doctor Prescribed",
-    },
-    {
-      name: "Vitamin D",
-      times: ["10:00"],
-      dose: "1 capsule",
-      frequency: 1,
-      source: "Your added",
-    },
-  ]);
+  const [medicines, setMedicines] = useState<Medicine[]>([]);
 
   const dummyPrescriptions: Prescription[] = [
-    {
-      id: "pres1",
-      patientName: "John Doe",
-      doctorName: "Dr. Smith",
-      medicines: [
-        {
-          name: "Aspirin",
-          times: ["08:00", "20:00"],
-          dose: "2 tablets",
-          frequency: 2,
-          source: "Doctor Prescribed",
-        },
-        {
-          name: "Vitamin D",
-          times: ["10:00"],
-          dose: "1 capsule",
-          frequency: 1,
-          source: "Doctor Prescribed",
-        },
-      ],
-      dateIssued: "2024-09-10",
-      instructions: "Take with food. Do not exceed the recommended dosage.",
-    },
-    {
-      id: "pres2",
-      patientName: "Jane Roe",
-      doctorName: "Dr. Johnson",
-      medicines: [
-        {
-          name: "Ibuprofen",
-          times: ["09:00", "21:00"],
-          dose: "1 tablet",
-          frequency: 2,
-          source: "Doctor Prescribed",
-        },
-        {
-          name: "Calcium",
-          times: ["08:00"],
-          dose: "1 tablet",
-          frequency: 1,
-          source: "Doctor Prescribed",
-        },
-      ],
-      dateIssued: "2024-09-15",
-      instructions: "Take after meals. Avoid alcohol while on this medication.",
-    },
+    // {
+    //   id: "pres1",
+    //   patientName: "John Doe",
+    //   doctorName: "Dr. Smith",
+    //   medicines: [
+    //     {
+    //       name: "Aspirin",
+    //       timesToTake: ["08:00", "20:00"],
+    //       dosage: "2 tablets",
+    //       frequency: "2",
+    //       source: "DOCTOR",
+    //     },
+    //     {
+    //       name: "Vitamin D",
+    //       timesToTake: ["10:00"],
+    //       dosage: "1 capsule",
+    //       frequency: "1",
+    //       source: "DOCTOR",
+    //     },
+    //   ],
+    //   dateIssued: "2024-09-10",
+    //   instructions: "Take with food. Do not exceed the recommended dosage.",
+    // },
+    // {
+    //   id: "pres2",
+    //   patientName: "Jane Roe",
+    //   doctorName: "Dr. Johnson",
+    //   medicines: [
+    //     {
+    //       name: "Ibuprofen",
+    //       timesToTake: ["09:00", "21:00"],
+    //       dosage: "1 tablet",
+    //       frequency: "2",
+    //       source: "PATIENT",
+    //     },
+    //     {
+    //       name: "Calcium",
+    //       timesToTake: ["08:00"],
+    //       dosage: "1 tablet",
+    //       frequency: "1",
+    //       source: "PATIENT",
+    //     },
+    //   ],
+    //   dateIssued: "2024-09-15",
+    //   instructions: "Take after meals. Avoid alcohol while on this medication.",
+    // },
   ];
 
   const [newMedicine, setNewMedicine] = useState<Medicine>({
     name: "",
-    times: [],
-    dose: "",
-    frequency: 0,
-    source: "Doctor Prescribed",
+    timesToTake: [],
+    dosage: "",
+    frequency: "0",
+    source: "DOCTOR",
   });
 
   const [newTime, setNewTime] = useState(""); // stores individual time input
@@ -114,29 +105,54 @@ export default function Medications() {
   const [error, setError] = useState<string>(""); // For displaying error messages
 
   const validateMedicine = (medicine: Medicine) => {
-    if (!medicine.name || !medicine.dose || medicine.times.length === 0) {
+    if (
+      !medicine.name ||
+      !medicine.dosage ||
+      medicine.timesToTake.length === 0
+    ) {
       setError("All fields are required. Please fill out all fields.");
       return false;
     }
     return true;
   };
 
+  useEffect(() => {
+    const getMedications = async () => {
+      try {
+        const response = await api.get("medication");
+        console.log(response);
+        setMedicines(response.data.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getMedications();
+  }, []);
+
   const addMedicine = () => {
     if (validateMedicine(newMedicine)) {
+      console.log(newMedicine);
+      const createMedicine = async () => {
+        const response = await api.post("medication", newMedicine);
+        console.log(response);
+      };
+
+      createMedicine();
+
       setMedicines([
         ...medicines,
-        { ...newMedicine, frequency: newMedicine.times.length }, // Automatically set frequency based on times length
+        { ...newMedicine, frequency: `${newMedicine.timesToTake.length}` }, // Automatically set frequency based on timesToTake length
       ]);
       setNewMedicine({
         name: "",
-        times: [],
-        dose: "",
-        frequency: 0,
-        source: "Doctor Prescribed",
+        timesToTake: [],
+        dosage: "",
+        frequency: "0",
+        source: "DOCTOR",
       });
-      setNewTime(""); // clear time input
+      setNewTime("");
       setShowModal(false);
-      setError(""); // Clear error message
+      setError("");
     }
   };
 
@@ -144,8 +160,8 @@ export default function Medications() {
     if (newTime) {
       setNewMedicine({
         ...newMedicine,
-        times: [...newMedicine.times, newTime],
-        frequency: newMedicine.times.length + 1, // Update frequency as times array grows
+        timesToTake: [...newMedicine.timesToTake, { time: newTime }],
+        frequency: `${newMedicine.timesToTake.length + 1}`, // Update frequency as timesToTake array grows
       });
       setNewTime("");
     }
@@ -155,18 +171,26 @@ export default function Medications() {
     if (editMedicine) {
       setEditMedicine({
         ...editMedicine,
-        times: editMedicine.times.filter((t) => t !== time),
-        frequency: editMedicine.times.length - 1,
+        timesToTake: editMedicine.timesToTake.filter((t) => t.time !== time),
+        frequency: `${editMedicine.timesToTake.length - 1}`,
       });
     }
   };
 
-  const confirmDeleteMedicine = (index: number) => {
-    setSelectedMedicineIndex(index);
+  const confirmDeleteMedicine = (id: number) => {
+    setSelectedMedicineIndex(id);
     setShowConfirmModal(true);
   };
 
-  const deleteMedicine = () => {
+  const deleteMedicine = async () => {
+    try {
+      const response = await api.delete(`medication/${selectedMedicineIndex}`);
+      console.log(response);
+      setSelectedMedicineIndex(selectedMedicineIndex);
+      setShowConfirmModal(true);
+    } catch (error) {
+      console.log(error);
+    }
     if (selectedMedicineIndex !== null) {
       setMedicines(medicines.filter((_, i) => i !== selectedMedicineIndex));
       setSelectedMedicineIndex(null);
@@ -189,7 +213,7 @@ export default function Medications() {
       const updatedMedicines = [...medicines];
       updatedMedicines[selectedMedicineIndex] = {
         ...editMedicine,
-        frequency: editMedicine.times.length,
+        frequency: `${editMedicine.timesToTake.length}`,
       };
       setMedicines(updatedMedicines); // Update the medicines list with edited medicine
       setShowEditModal(false); // Close the modal
@@ -202,8 +226,8 @@ export default function Medications() {
     if (newTime && editMedicine) {
       setEditMedicine({
         ...editMedicine,
-        times: [...editMedicine.times, newTime],
-        frequency: editMedicine.times.length + 1,
+        timesToTake: [...editMedicine.timesToTake, { time: newTime }],
+        frequency: `${editMedicine.timesToTake.length + 1}`,
       });
       setNewTime(""); // Clear the time input
     }
@@ -213,8 +237,8 @@ export default function Medications() {
     if (editMedicine) {
       setEditMedicine({
         ...editMedicine,
-        times: editMedicine.times.filter((t) => t !== time),
-        frequency: editMedicine.times.length - 1,
+        timesToTake: editMedicine.timesToTake.filter((t) => t.time !== time),
+        frequency: `${editMedicine.timesToTake.length - 1}`,
       });
     }
   };
@@ -241,30 +265,34 @@ export default function Medications() {
 
       {/* List of Medicines */}
       <div className="grid grid-cols-1 gap-4 mb-6">
-        {medicines.map((med, index) => (
+        {medicines.map((med) => (
           <div
-            key={index}
+            //@ts-ignore
+            key={med.id}
             className="p-4 border rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow relative"
           >
             <div className="font-semibold text-xl text-gray-800">
               {med.name}
             </div>
             <div className="text-gray-600">
-              {med.dose} at{" "}
-              <span className="italic">{med.times.join(", ")}</span>
+              {med.dosage} at{" "}
+              <span className="italic">
+                {med.timesToTake.map((t) => t.time).join(", ")}
+              </span>
             </div>
             <div className="text-gray-600">
-              Frequency: {med.frequency} times/day
+              Frequency: {med.frequency} timesToTake/day
             </div>
             <div className="text-gray-600">Source: {med.source}</div>
 
             {/* Container for Edit and Delete buttons */}
             <div className="absolute top-2 right-2 flex space-x-2">
               {/* Edit button when source is 'Your added' */}
-              {med.source === "Your added" && (
+              {med.source === "PATIENT" && (
                 <Button
                   variant="secondary"
-                  onClick={() => handleEditMedicine(index)}
+                  //@ts-ignore
+                  onClick={() => handleEditMedicine(med.id)}
                   className="bg-transparent hover:bg-blue-100 transition p-2"
                 >
                   <Edit2 className="w-5 h-5 text-blue-600" />
@@ -274,7 +302,8 @@ export default function Medications() {
               {/* Delete button with Trash Icon */}
               <Button
                 variant="destructive"
-                onClick={() => confirmDeleteMedicine(index)}
+                //@ts-ignore
+                onClick={() => confirmDeleteMedicine(med.id)}
                 className="bg-transparent hover:bg-red-100 transition p-2"
               >
                 <Trash2 className="w-5 h-5 text-red-600" />
@@ -316,7 +345,7 @@ export default function Medications() {
             </div>
             <div className="mb-5">
               <Label
-                htmlFor="times"
+                htmlFor="timesToTake"
                 className="block mb-2 font-medium text-gray-700"
               >
                 Times
@@ -324,7 +353,7 @@ export default function Medications() {
               <div className="flex gap-2">
                 <Input
                   type="time"
-                  id="times"
+                  id="timesToTake"
                   value={newTime}
                   onChange={(e) => setNewTime(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -340,41 +369,48 @@ export default function Medications() {
                 <Label className="block mb-1 font-medium text-gray-700">
                   Selected Times:
                 </Label>
-                {newMedicine.times.map((time, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between mb-1"
-                  >
-                    <span>{time}</span>
-                    <Button
-                      onClick={() =>
-                        setNewMedicine({
-                          ...newMedicine,
-                          times: newMedicine.times.filter((t) => t !== time),
-                          frequency: newMedicine.times.length - 1,
-                        })
-                      }
-                      className="bg-red-600 text-white hover:bg-red-700 p-1 rounded"
+                {newMedicine.timesToTake.map(
+                  (
+                    t,
+                    idx // Accessing the time object
+                  ) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between mb-1"
                     >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ))}
+                      <span>{t.time}</span> {/* Display the time */}
+                      <Button
+                        onClick={() =>
+                          setNewMedicine({
+                            ...newMedicine,
+                            timesToTake: newMedicine.timesToTake.filter(
+                              (timeObj) => timeObj.time !== t.time
+                            ), // Remove based on the 'time' field
+                            frequency: `${newMedicine.timesToTake.length - 1}`,
+                          })
+                        }
+                        className="bg-red-600 text-white hover:bg-red-700 p-1 rounded"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )
+                )}
               </div>
             </div>
             <div className="mb-5">
               <Label
-                htmlFor="dose"
+                htmlFor="dosage"
                 className="block mb-2 font-medium text-gray-700"
               >
-                Dose
+                dosage
               </Label>
               <Input
-                id="dose"
-                placeholder="Enter dose"
-                value={newMedicine.dose}
+                id="dosage"
+                placeholder="Enter dosage"
+                value={newMedicine.dosage}
                 onChange={(e) =>
-                  setNewMedicine({ ...newMedicine, dose: e.target.value })
+                  setNewMedicine({ ...newMedicine, dosage: e.target.value })
                 }
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
@@ -392,15 +428,13 @@ export default function Medications() {
                 onChange={(e) =>
                   setNewMedicine({
                     ...newMedicine,
-                    source: e.target.value as
-                      | "Doctor Prescribed"
-                      | "Your added",
+                    source: e.target.value as "DOCTOR" | "PATIENT",
                   })
                 }
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               >
-                <option value="Doctor Prescribed">Doctor Prescribed</option>
-                <option value="Your added">Your added</option>
+                <option value="DOCTOR">Doctor Prescribed</option>
+                <option value="PATIENT">Your added</option>
               </select>
             </div>
             <div className="flex justify-end">
@@ -410,10 +444,10 @@ export default function Medications() {
                   setShowModal(false);
                   setNewMedicine({
                     name: "",
-                    times: [],
-                    dose: "",
-                    frequency: 0,
-                    source: "Doctor Prescribed",
+                    timesToTake: [],
+                    dosage: "",
+                    frequency: "0",
+                    source: "DOCTOR",
                   });
                   setNewTime(""); // Clear time input
                 }}
@@ -488,14 +522,15 @@ export default function Medications() {
                           <strong>Name:</strong> {medicine.name}
                         </p>
                         <p>
-                          <strong>Times:</strong> {medicine.times.join(", ")}
+                          <strong>Times:</strong>{" "}
+                          {medicine.timesToTake.join(", ")}
                         </p>
                         <p>
-                          <strong>Dose:</strong> {medicine.dose}
+                          <strong>dosage:</strong> {medicine.dosage}
                         </p>
                         <p>
-                          <strong>Frequency:</strong> {medicine.frequency} times
-                          a day
+                          <strong>Frequency:</strong> {medicine.frequency}{" "}
+                          timesToTake a day
                         </p>
                         <p>
                           <strong>Source:</strong> {medicine.source}
@@ -546,7 +581,7 @@ export default function Medications() {
             </div>
             <div className="mb-5">
               <Label
-                htmlFor="times"
+                htmlFor="timesToTake"
                 className="block mb-2 font-medium text-gray-700"
               >
                 Times
@@ -554,7 +589,7 @@ export default function Medications() {
               <div className="flex gap-2">
                 <Input
                   type="time"
-                  id="times"
+                  id="timesToTake"
                   value={newTime}
                   onChange={(e) => setNewTime(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -570,14 +605,14 @@ export default function Medications() {
                 <Label className="block mb-1 font-medium text-gray-700">
                   Selected Times:
                 </Label>
-                {editMedicine.times.map((time, idx) => (
+                {editMedicine.timesToTake.map((time, idx) => (
                   <div
                     key={idx}
                     className="flex items-center justify-between mb-1"
                   >
-                    <span>{time}</span>
+                    <span>{time.time}</span>
                     <Button
-                      onClick={() => removeEditTime(time)}
+                      onClick={() => removeEditTime(time.time)}
                       className="bg-red-600 text-white hover:bg-red-700 p-1 rounded"
                     >
                       <X className="w-4 h-4" />
@@ -588,17 +623,17 @@ export default function Medications() {
             </div>
             <div className="mb-5">
               <Label
-                htmlFor="dose"
+                htmlFor="dosage"
                 className="block mb-2 font-medium text-gray-700"
               >
-                Dose
+                dosage
               </Label>
               <Input
-                id="dose"
-                placeholder="Enter dose"
-                value={editMedicine.dose}
+                id="dosage"
+                placeholder="Enter dosage"
+                value={editMedicine.dosage}
                 onChange={(e) =>
-                  setEditMedicine({ ...editMedicine, dose: e.target.value })
+                  setEditMedicine({ ...editMedicine, dosage: e.target.value })
                 }
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
@@ -616,15 +651,13 @@ export default function Medications() {
                 onChange={(e) =>
                   setEditMedicine({
                     ...editMedicine,
-                    source: e.target.value as
-                      | "Doctor Prescribed"
-                      | "Your added",
+                    source: e.target.value as "DOCTOR" | "PATIENT",
                   })
                 }
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               >
-                <option value="Doctor Prescribed">Doctor Prescribed</option>
-                <option value="Your added">Your added</option>
+                <option value="DOCTOR">Doctor Prescribed</option>
+                <option value="PATIENT">Your added</option>
               </select>
             </div>
             <div className="flex justify-end">

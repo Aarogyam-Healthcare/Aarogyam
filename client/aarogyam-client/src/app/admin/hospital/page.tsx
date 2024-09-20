@@ -1,20 +1,22 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
-  MapPin,
-  Link,
   ClipboardList,
-  Phone,
-  Trash2,
-  PlusCircle,
+  Link,
   Mail,
+  MapPin,
+  Phone,
+  PlusCircle,
+  Trash2,
 } from "lucide-react"; // Import Lucide Icons
+import api from "@/lib/api";
+import CreatableReactSelect from "react-select/creatable";
 
 interface Hospital {
   id: number;
   name: string;
-  location: string;
-  url: string;
+  address: string;
+  website: string;
   services: string;
   phone: string;
   email: string;
@@ -30,8 +32,8 @@ const HospitalsPage = () => {
   const [newHospital, setNewHospital] = useState<Hospital>({
     id: 0,
     name: "",
-    location: "",
-    url: "",
+    address: "",
+    website: "",
     services: "",
     phone: "",
     email: "",
@@ -45,8 +47,8 @@ const HospitalsPage = () => {
         {
           id: 1,
           name: "City Hospital",
-          location: "Downtown",
-          url: "https://cityhospital.com",
+          address: "Downtown",
+          website: "https://cityhospital.com",
           services: "Emergency, Surgery, General Medicine",
           phone: "123-456-7890",
           email: "abc@gmail.com",
@@ -54,8 +56,8 @@ const HospitalsPage = () => {
         {
           id: 2,
           name: "Greenwood Clinic",
-          location: "Suburb",
-          url: "https://greenwoodclinic.com",
+          address: "Suburb",
+          website: "https://greenwoodclinic.com",
           services: "Primary Care, Pediatrics, Dermatology",
           phone: "234-567-8901",
           email: "abc@gmail.com",
@@ -63,14 +65,18 @@ const HospitalsPage = () => {
         {
           id: 3,
           name: "Northside Health Center",
-          location: "Northside",
-          url: "https://northsidehealth.com",
+          address: "Northside",
+          website: "https://northsidehealth.com",
           services: "Orthopedics, Cardiology, Neurology",
           phone: "345-678-9012",
           email: "abc@gmail.com",
         },
       ];
-      setHospitals(data);
+
+      const response = await api.get("hospital");
+      console.log(response);
+      setHospitals(response.data.data);
+      console.log(typeof hospitals);
     };
 
     fetchHospitals();
@@ -103,8 +109,8 @@ const HospitalsPage = () => {
     setNewHospital({
       id: 0,
       name: "",
-      location: "",
-      url: "",
+      address: "",
+      website: "",
       services: "",
       phone: "",
       email: "",
@@ -120,8 +126,8 @@ const HospitalsPage = () => {
   const handleAddHospital = () => {
     if (
       !newHospital.name ||
-      !newHospital.location ||
-      !newHospital.url ||
+      !newHospital.address ||
+      !newHospital.website ||
       !newHospital.services ||
       !newHospital.phone ||
       !newHospital.email
@@ -132,10 +138,21 @@ const HospitalsPage = () => {
     } else if (!validateEmail(newHospital.email)) {
       setWarningMessage("Please enter a valid email address.");
     } else {
+      console.log(newHospital);
+
+      const addHospital = async () => {
+        try {
+          const { id, ...hospital } = newHospital;
+          const response = await api.post("hospital", hospital);
+          console.log(response);
+          setHospitals((prevHospitals) => [...prevHospitals]);
+        } catch (error) {}
+      };
       setHospitals((prevHospitals) => [
         ...prevHospitals,
         { ...newHospital, id: prevHospitals.length + 1 },
       ]);
+      addHospital();
       closeAddModal();
     }
   };
@@ -173,24 +190,24 @@ const HospitalsPage = () => {
 
             <div className="flex items-center text-gray-600 mb-2">
               <MapPin className="w-5 h-5 mr-2 text-blue-500" />
-              <p>{hospital.location}</p>
+              <p>{hospital.address}</p>
             </div>
 
             <div className="flex items-center text-gray-600 mb-2">
               <Link className="w-5 h-5 mr-2 text-blue-500" />
               <a
-                href={hospital.url}
+                href={hospital.website}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline"
               >
-                {hospital.url}
+                {hospital.website}
               </a>
             </div>
 
             <div className="flex items-center text-gray-600 mb-2">
               <ClipboardList className="w-5 h-5 mr-2 text-blue-500" />
-              <p>{hospital.services}</p>
+              <p>{hospital.services.join(",")}</p>
             </div>
 
             <div className="flex items-center text-gray-600 mb-2">
@@ -251,11 +268,11 @@ const HospitalsPage = () => {
               <input
                 type="text"
                 placeholder="Location"
-                value={newHospital.location}
+                value={newHospital.address}
                 onChange={(e) =>
                   setNewHospital((prev) => ({
                     ...prev,
-                    location: e.target.value,
+                    address: e.target.value,
                   }))
                 }
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
@@ -263,13 +280,16 @@ const HospitalsPage = () => {
               <input
                 type="text"
                 placeholder="Website URL"
-                value={newHospital.url}
+                value={newHospital.website}
                 onChange={(e) =>
-                  setNewHospital((prev) => ({ ...prev, url: e.target.value }))
+                  setNewHospital((prev) => ({
+                    ...prev,
+                    website: e.target.value,
+                  }))
                 }
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
               />
-              <input
+              {/* <input
                 type="text"
                 placeholder="Services"
                 value={newHospital.services}
@@ -280,6 +300,61 @@ const HospitalsPage = () => {
                   }))
                 }
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+              /> */}
+              <CreatableReactSelect
+                isMulti
+                placeholder="Select or create specialities"
+                className="react-select-container"
+                classNamePrefix="react-select"
+                onChange={(selectedOptions) =>
+                  // @ts-ignore
+                  setNewHospital((prev) => ({
+                    ...prev,
+                    services: selectedOptions
+                      ? // @ts-ignore
+                        selectedOptions.map((option) => option.value)
+                      : [],
+                  }))
+                }
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    borderColor: state.isFocused
+                      ? "hsl(var(--ring))"
+                      : "hsl(var(--input))",
+                    boxShadow: state.isFocused
+                      ? "0 0 0 1px hsl(var(--ring))"
+                      : "none",
+                    "&:hover": {
+                      borderColor: "hsl(var(--input))",
+                    },
+                  }),
+                  option: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: state.isFocused
+                      ? "hsl(var(--accent))"
+                      : "transparent",
+                    color: state.isFocused
+                      ? "hsl(var(--accent-foreground))"
+                      : "inherit",
+                  }),
+                  multiValue: (baseStyles) => ({
+                    ...baseStyles,
+                    backgroundColor: "hsl(var(--secondary))",
+                  }),
+                  multiValueLabel: (baseStyles) => ({
+                    ...baseStyles,
+                    color: "hsl(var(--secondary-foreground))",
+                  }),
+                  multiValueRemove: (baseStyles) => ({
+                    ...baseStyles,
+                    color: "hsl(var(--secondary-foreground))",
+                    "&:hover": {
+                      backgroundColor: "hsl(var(--destructive))",
+                      color: "hsl(var(--destructive-foreground))",
+                    },
+                  }),
+                }}
               />
               <input
                 type="text"

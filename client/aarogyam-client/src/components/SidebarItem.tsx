@@ -14,7 +14,9 @@ export function SidebarItem({ icon, text, active, alert }: SidebarItemProps) {
   return (
     <li
       className={`relative flex items-center font-medium rounded-md cursor-pointer transition-colors group
-        ${active ? "text-primary" : "hover:bg-accent text-muted-foreground"} ${!expanded ? "py-1 justify-center" : "justify-between"}`}
+        ${active ? "text-primary" : "hover:bg-accent text-muted-foreground"} ${
+        !expanded ? "py-1 justify-center" : "justify-between"
+      }`}
     >
       <span>{icon}</span>
       <span
@@ -34,7 +36,9 @@ export function SidebarItem({ icon, text, active, alert }: SidebarItemProps) {
 
       {!expanded && (
         <div
-          className={`absolute left-full rounded-md px-2 py-1 ml-6 bg-secondary text-sm invisible opacity-20 -translate-x-3 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-0 ${active ? "text-primary" : "text-muted-foreground"}`}
+          className={`absolute left-full rounded-md px-2 py-1 ml-6 bg-secondary text-sm invisible opacity-20 -translate-x-3 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-0 ${
+            active ? "text-primary" : "text-muted-foreground"
+          }`}
         >
           {text}
         </div>

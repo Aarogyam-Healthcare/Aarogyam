@@ -49,18 +49,14 @@ export const findByContactIdAndPatientId = async (
  * @returns A promise that resolves to the updated emergency contact or null if not found.
  */
 export const updateContact = async (
-  patientId: number,
   contactData: ContactUpdateDTO
 ): Promise<EmergencyContacts | null> => {
-  return emergencyContact.upsert({
+  return emergencyContact.update({
     where: {
       id: contactData.id,
-      patientId,
     },
-    update: contactData,
-    create: {
+    data: {
       ...contactData,
-      patientId,
     },
   });
 };

@@ -31,6 +31,7 @@ export const createHospital = async (
       return res
         .status(400)
         .json(Format.badRequest(validation.error.errors, "Validation error"));
+
     const result = await hospitalService.createHospital(validation.data);
     return res.status(result.code).json(result);
   } catch (error: unknown) {
@@ -113,6 +114,21 @@ export const updateHospital = async (
     );
     return res.status(result.code).json(result);
   } catch (error: unknown) {
+    next(error);
+  }
+};
+
+export const getAllHospital = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> => {
+  try {
+    const user: SafeUser = req.user as SafeUser;
+    const result = await hospitalService.getAllHospital(user);
+
+    return res.status(result.code).json(result);
+  } catch (error) {
     next(error);
   }
 };
