@@ -22,6 +22,9 @@ export const getByPatient = async (
     where: {
       patientId,
     },
+    include: {
+      doctor: true,
+    },
   });
 };
 

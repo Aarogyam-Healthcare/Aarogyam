@@ -68,7 +68,10 @@ export const updateContact = async (
     );
 
   // Update the existing contact with the new data
-  const updatedContact = await emergencyContactDao.updateContact(contactData);
+  const updatedContact = await emergencyContactDao.updateContact(
+    patientId,
+    contactData
+  );
   // Return success response with the updated contact
   return Format.success(
     updatedContact,
