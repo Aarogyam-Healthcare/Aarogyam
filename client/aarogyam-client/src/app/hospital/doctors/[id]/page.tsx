@@ -177,8 +177,8 @@ export default function DoctorPage({ params }: { params: { id: string } }) {
                     appointment.status === "pending"
                       ? "default"
                       : appointment.status === "completed"
-                        ? "secondary"
-                        : "destructive"
+                      ? "secondary"
+                      : "destructive"
                   }
                 >
                   {appointment.status}

@@ -109,3 +109,12 @@ export const findHospitalByUserID = (
     },
   });
 };
+
+export const findHospitalsByUserIds = (): Promise<Hospital[]> => {
+  return hospital.findMany({
+    include: {
+      user: true,
+      services: true,
+    },
+  });
+};

@@ -44,6 +44,7 @@ export const findByContactIdAndPatientId = async (
 /**
  * Updates an existing emergency contact.
  *
+ * @param patientId
  * @param contactData - The data of the contact to be updated.
  * @returns A promise that resolves to the updated emergency contact or null if not found.
  */
@@ -54,7 +55,9 @@ export const updateContact = async (
     where: {
       id: contactData.id,
     },
-    data: contactData,
+    data: {
+      ...contactData,
+    },
   });
 };
 
@@ -64,6 +67,7 @@ export const updateContact = async (
  * @param id - The ID of the contact to be deleted.
  * @returns A promise that resolves to the deleted emergency contact or null if not found.
  */
+
 export const deleteContact = async (
   id: number
 ): Promise<EmergencyContacts | null> => {

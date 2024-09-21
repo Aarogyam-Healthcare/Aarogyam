@@ -2,12 +2,12 @@
 import React, { useState } from "react";
 import {
   Table,
-  TableHeader,
   TableBody,
+  TableCell,
   TableFooter,
   TableHead,
+  TableHeader,
   TableRow,
-  TableCell,
 } from "@/components/ui/table";
 import {
   Popover,
@@ -17,13 +17,13 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
-  DialogHeader,
   DialogFooter,
+  DialogHeader,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input"; // Assuming you are using Input from Shadcn UI
-import { Edit, Trash, MoreVertical, Plus } from "lucide-react";
+import { Edit, MoreVertical, Plus, Trash } from "lucide-react";
 
 const MedicalRecords = () => {
   const [showActions, setShowActions] = useState<number | null>(null);

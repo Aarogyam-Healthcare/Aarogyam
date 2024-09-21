@@ -44,8 +44,8 @@ export const checkSlotAvailability = async (
 
 export const getSlot = async (
   doctorId: number
-): Promise<AppointmentSlot | null> => {
-  return appointmentSlotClient.findFirst({
+): Promise<AppointmentSlot[] | null> => {
+  return appointmentSlotClient.findMany({
     where: {
       doctorId,
     },

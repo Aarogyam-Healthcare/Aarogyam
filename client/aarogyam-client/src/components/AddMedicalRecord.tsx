@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
@@ -16,8 +16,8 @@ import {
 } from "@/components/ui/form";
 import {
   Select,
-  SelectItem,
   SelectContent,
+  SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -35,6 +35,7 @@ import { formatDate } from "@/utils/formatter";
 import { MedicalRecordSchema } from "@/utils/validations/MedicalRecordSchema";
 
 type MedicalRecordFormValues = z.infer<typeof MedicalRecordSchema>;
+
 interface Person {
   id: number;
   name: string;
@@ -196,7 +197,9 @@ export default function AddMedicalRecord({
                   >
                     <SelectTrigger>
                       <SelectValue
-                        placeholder={`Select a ${role === "doctor" ? "Patient" : "Doctor"}`}
+                        placeholder={`Select a ${
+                          role === "doctor" ? "Patient" : "Doctor"
+                        }`}
                       />
                     </SelectTrigger>
                     <SelectContent>

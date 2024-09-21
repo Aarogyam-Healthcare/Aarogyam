@@ -32,7 +32,9 @@ export default function Sidebar({ children }: { children: ReactNode }) {
 
   return (
     <aside
-      className={`h-screen ${expanded ? "w-[14rem]" : "w-16"} transition-all duration-200 ease-in-out hidden sm:block`}
+      className={`h-screen ${
+        expanded ? "w-[14rem]" : "w-16"
+      } transition-all duration-200 ease-in-out hidden sm:block`}
     >
       <nav className="h-full flex flex-col bg-white border-r shadow-sm">
         <div className="p-2.5 flex justify-between items-center">

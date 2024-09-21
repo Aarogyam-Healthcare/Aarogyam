@@ -2,7 +2,10 @@ import * as medicationService from "../services/medication.service";
 import { NextFunction, Request, Response } from "express";
 import { SafeUser } from "../types/user.dto";
 import Format from "../utils/format";
-import { MedicationSchema } from "../types/medication.dto";
+import {
+  MedicationSchema,
+  MedicationUpdateSchema,
+} from "../types/medication.dto";
 
 export const createMedication = async (
   req: Request,
@@ -80,7 +83,7 @@ export const updateMedication = async (
   next: NextFunction
 ): Promise<any> => {
   const user: SafeUser = req.user as SafeUser;
-  const validation = MedicationSchema.safeParse({
+  const validation = MedicationUpdateSchema.safeParse({
     ...req.body,
   });
   if (!validation.success)

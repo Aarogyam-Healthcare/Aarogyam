@@ -30,8 +30,8 @@ export const deleteMedication = async (
 
 export const getAllMedicationsByPatientId = async (
   patientId: number
-): Promise<Medication | null> => {
-  return medicationClient.findFirst({
+): Promise<Medication[] | null> => {
+  return medicationClient.findMany({
     where: {
       patientId,
     },

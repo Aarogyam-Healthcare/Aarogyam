@@ -7,10 +7,10 @@ import { z } from "zod";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,12 +22,12 @@ import {
 } from "@/components/ui/popover";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardDescription,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Loader2, MapPin, Hospital } from "lucide-react";
+import { Hospital, Loader2, MapPin } from "lucide-react";
 import Link from "next/link";
 import { AppointmentSchema } from "@/utils/validations/AppointmentSchema";
 import { formatDate, formatTime } from "@/utils/formatter";

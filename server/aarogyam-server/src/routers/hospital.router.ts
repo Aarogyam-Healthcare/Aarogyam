@@ -49,4 +49,6 @@ router.delete(
   hospitalController.deleteHospital
 );
 
+router.get("", verifyRole([Role.ADMIN]), hospitalController.getAllHospital);
+
 export default router;

@@ -2,7 +2,7 @@ import z from "zod";
 
 const MedicationTimeSchema = z.object({
   time: z.string(),
-  medicationId: z.number(),
+  medicationId: z.number().optional(),
 });
 
 export const MedicationSchema = z.object({

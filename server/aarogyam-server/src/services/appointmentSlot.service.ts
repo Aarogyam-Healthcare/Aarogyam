@@ -49,10 +49,7 @@ export const getAppointmentSlot = async (doctorId: number): Promise<any> => {
   }
 
   const getAppointment = await appointmentSlotDao.getSlot(doctorId);
-  return Format.success(
-    getAppointment,
-    "Appointment Slot created successfully"
-  );
+  return Format.success(getAppointment, "Appointment Slot geted successfully");
 };
 
 export const updateAppointmentSlot = async (

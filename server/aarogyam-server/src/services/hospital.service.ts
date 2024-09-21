@@ -40,6 +40,7 @@ const getServiceIds = async (services: string[]): Promise<number[]> => {
 export const createHospital = async (
   hospitalCreateDTO: HospitalCreateDTO
 ): Promise<any> => {
+  console.log(hospitalCreateDTO);
   const existingUser: any = await userDao.findByEmailOrPhone(
     hospitalCreateDTO.email,
     hospitalCreateDTO.phone
@@ -137,4 +138,30 @@ export const updateHospital = async (
   const updatedUser = await userDao.getUserWithRole(userId, Role.HOSPITAL);
 
   return Format.success(updatedUser, "Hospital update successfully");
+};
+
+export const getAllHospital = async (user: SafeUser): Promise<any> => {
+  if (user.role === "ADMIN") {
+    const hospitals =
+      (await hospitalDao.findHospitalsByUserIds()) as (Hospital & {
+        user: User;
+        services: Service[];
+      })[];
+    const transformedHospitals = hospitals.map((hospital) => ({
+      id: hospital.id,
+      name: hospital.user.name,
+      email: hospital.user.email,
+      phone: hospital.user.phone,
+      address: hospital.user.address,
+      profileImage: hospital.user.profileImage,
+      website: hospital.website,
+      createdAt: hospital.createdAt,
+      updatedAt: hospital.updatedAt,
+      services: hospital.services.map((service) => service.name),
+    }));
+
+    return Format.success(transformedHospitals, "Hospital get successfully");
+  } else {
+    return Format.notFound("User is not admin");
+  }
 };
